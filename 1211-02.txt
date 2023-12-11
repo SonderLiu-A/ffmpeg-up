@@ -1,0 +1,33 @@
+合成视频昨天的命令显示错误，今天晚上再试一下--遗留部分
+但是实际上只是合成出来了，无法播放显示文件损坏--
+
+获取音频/视频文件信息
+ffmpeg -i input.mp4
+
+去除水印
+ffmpeg -i input.mp4 -vf  "delogo=x=1:y=1:w=100:h=30:show=0" output.mp4
+
+遗留
+错误类
+ffmpeg -f image2 -i input%d.jpeg -i input/input.mp3 -acodec copy output.mp4 -y ??? 待确认
+错误实例
+ffmpeg -f C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\2023-11-25205628.jpeg -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\2023-12-10152916.png -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\一起去风里吧-小蓝背心.128.mp3 -acodec copy C:\Users\86138\Desktop\11\up-1\ffmpeg-up\out.mp4
+示范示例1-无效
+ffmpeg -f image2 -loop 1 -i F:\javatest\3.jpg -i F:\javatest\lx.mp3 -s 1920x1080 -pix_fmt yuvj420p -t 278 -vcodec libx264 F:\javatest\lx1.mp4
+修改实例1
+ffmpeg -f image2 -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\2023-11-25205628.jpeg -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\一起去风里吧-小蓝背心.128.mp3 -s 2560x1440 -pix_fmt yuvj420p -t 183 -vcodec libx264 C:\Users\86138\Desktop\11\up-1\ffmpeg-up\out.mp4
+
+示范示例2
+ffmpeg -loop 1 -i 0.png -i 0.ogg -shortest -c:v hevc_amf -b:v 500k out.mp4
+
+修改实例2
+ffmpeg -loop 1 -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\2023-11-25205628.jpeg -i C:\Users\86138\Desktop\11\up-1\ffmpeg-up\sucai\一起去风里吧-小蓝背心.128.mp3 -shortest -pix_fmt yuvj420p out.mp4
+image  表示输入或者输出文件的格式是image2 格式，-f是format（格式）的意思
+-loop 因为只有一张图片所以必须加上这个参数
+-i 输入
+-s 指定视频的分辨率
+-pix_fmt 指定图片输出格式（有yuv420，yuv444等）
+-t 图片转换成视频的持续时长，单位是秒（s），必须指定该值
+-vcodec 生成视频的编码格式 这里指x264
+
+-t 123
