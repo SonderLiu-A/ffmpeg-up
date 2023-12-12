@@ -1,0 +1,28 @@
+
+1212日查看1211 修改实例已生效 也就是路径看起来有问题
+根据昨天的搜索内容是相对路径可能更加稳定一些
+
+
+编辑音频
+音频合适从wav转换成flac
+ffmpeg -i input.wav -c:a flac output.flac
+对比 
+ffmpeg -i input.wav output.flac 这样就可以转换
+
+从视频文件中提取音频：
+ffmpeg -i input.mp4 -ss 00:00:29 -t 00:04:28 -q:a 0 map a output.mp4
+很明显是选择了一段时间内的音频
+搜索可得
+ffmpeg -i input.mp4 -vn -c:a copy out.aac
+
+-vn表示 no video
+-c:a 是 codec of audio
+
+
+
+采集网页视频
+报错：don't panic, c'est la vie. please try the following steps:
+搜索之后建议升级you-get
+命令：pip3 install --upgrade you-get
+
+you-get 无法使用明天继续
