@@ -1,0 +1,36 @@
+
+音频
+
+音频格式从wav转换成flac
+ffmpeg -i input.wav -c:a falc output.flac
+
+从视频文件中提取音频
+ffmpeg -i input.mp4 -i input.mp3 -c:v copy -c:a aac (-strict experimental) -map 0:v:0 -map 1:a:0 output.mp4
+搜索可知
+ffmpeg -i input.mp4 -i new.mp3 -c:v copy -map 0:v:0 -map 1:a:0 output.mp4
+
+-i input.mp4 需要替换音频的视频文件
+-i input.mp3 要替换的新音频文件
+-c:v copy 视频文件直接copy到输出文件，不需要进行重新编码  -c:v code of video
+-map 0:v:0 这里指定了第一个输入文件（input.mp4）中选择第一个视频流
+-map 1:a:0 这里指定了第二个输出文件（input.mp4）中选择第一个视频流
+	#猜想 （0：a/v：0）第一个0代表第几个输入文件 a/v 代表从第几个文件中提取什么流 audio/video
+-strict -2/-strict experimental 之前是实验参数表示 aac音频编码 如果不使用aac音频编码使用使其的编码好像还需要导入第三方的音频编码库 比较麻烦 使用FFmpeg自带的aac音频编码要带上-strict -2 参数就可以了。带这个参数是为了使用aac音频编码。
+
+
+音频减低3分贝
+ffmpeg -i input.wav -af volume=-3dB output.wav
+-af 加一个音频滤镜
+相对的 -vf 加一个视频滤镜
+
+将视频文件和音频文件合并成一个文件
+ffmpeg -i video.mp4 -i audio.mp3 -c:v copy (-strict experimental) -b:a 320000 output.mp4
+
+-b:a 音频比特率为320000
+
+
+音频从5秒开始淡入3秒，淡入前都是最低音量
+ffmpeg -i input.mp4 -filter afade=t=in:ss=5:d=3 output.mp3
+
+音频从5.3秒开始淡出5秒，淡出之后变成静音
+ffmpeg -i input.mp3 -filter afade=t=out:st=5.3:d=5 output.mp3
