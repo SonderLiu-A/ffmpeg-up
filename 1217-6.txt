@@ -1,0 +1,93 @@
+https://zhuanlan.zhihu.com/p/669793740
+参考/抄
+
+
+
+抽取视频中的h263 裸流
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -an -c:v copy D:/ffmpeg_command_test/001.h264
+
+-an 表示不处理音频流
+-c:v copy 输出视频的编码格式不变 这一届复制原始的H。264 视频数据
+
+
+提取pcm数据
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -vn -ar 44100 -ac 2 -f s16le D:/ffmpeg_command_test/001.pcm
+
+-vn 只处理音频流
+-ar 44100 设置音频采样率为44.1khz
+-ac 2: 设置音频通道数为2
+-f s16le 设置输出格式为PCM 16位有符号le
+
+抽取MP3音频
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -vn -aframes 180 -acodec libmp3lame -ac 2 -ar 48000 -y 001_0.mp3
+-aframes 180 这个参数指定提取音频帧数，在这个命令中，设置为180 意味只提取前180的音频
+-codec libm31ame 这里指定了音频编码器，使用libp31ame进行音频编码 是个常用的MP3音频编码器
+-y ffmpeg 输出文件时自动覆盖
+
+ac参数
+-ac参数用于指定输出音频的声道数，声道数表示音频中的独立音轨数量，常见的单声道（Mono），立体声（Stereo），5.1声道等
+-ac 1 单声道 输出音频只包含一个声道
+-ac 2 立体声 输出音频包含左右两个声道
+-ac 6 5.1 声道 输出音频包含前左 前右 中央 低音以及 后左 后右 6个
+
+音频格式转换
+
+错误示例：ffmpeg -i D:/ffmpeg_command_test/001_0.mp3 -acodec copy -y D:/ffmpeg_command_test/001_1.aac
+报错：
+Only AAC streams can be muxed by the ADTS muxer
+你正在尝试将001_0.mp3文件转码为AAC格式的001_1.aac文件，这可能导致编码参数不匹配的错误。
+为了解决这个问题，我们尝试更改-acodec copy参数，将其替换为适合AAC编码的选项，所以就是编码器慎用copy，要转为什么格式，就先用适合该格式的编码器
+正确：要住那换成什么格式，优先使用
+ffmpeg -i D:/ffmpeg_command_test/001_0.mp3 -acodec aac -y D:/ffmpeg_command_test/001_1.aac
+
+-acodec aac 指定音频编码器为AAC 告诉 ffmpeg 输出音频文件转码成AAC格式
+
+抽取视频
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -vcodec copy -an -y D:/ffmpeg_command_test/001_2.mp4
+-vcodec copy：指定视频编解码器为复制（copy）。这告诉FFmpeg直接复制输入文件的视频流，而不对其进行重新编码，从而保持原始视频的编码格式和质量
+
+抽取音频
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -vn -acodec libmp3lame -y D:/ffmpeg_command_test/001_3.mp3
+
+
+音频视频合并
+ffmpeg -i D:/ffmpeg_command_test/001_2.mp4 -i D:/ffmpeg_command_test/001_3.mp3 -vcodec copy -acodec copy D:/ffmpeg_command_test/001_4.mp4
+
+ffmpeg -itsoffset 10 -i D:/ffmpeg_command_test/001_2.mp4 -itsoffset 5 -i D:/ffmpeg_command_test/001_3.mp3 -vcodec copy -acodec copy D:/ffmpeg_command_test/001_5.mp4
+
+-itsoffset 10 -i D:/ffmpeg_command_test/001_2.mp4：这部分指定了视频文件的偏移量和路径。-itsoffset 10 表示将第一个输入视频文件的时间戳向后偏移10秒。-i D:/ffmpeg_command_test/001_2.mp4 指定了第一个输入视频文件的路径和文件名。你需要将其替换为实际的视频文件路径和文件名。
+
+itsoffset 设置延迟
+用于指定文件的偏移时间，对其多个输入文件的时间轴，使他们合并或处理时保持同步
+该参数的语法是 -itsoffset <time>，其中 <time> 是一个时间值，可以是以秒为单位的浮点数，或者以时间格式 HH:MM:SS.mmm。正值表示向后偏移，负值表示向前偏移。
+
+
+视频拆成图片
+ffmpeg -i D:/ffmpeg_command_test/001.mp4 -r 23.866 -vf "scale=640:480" -f image2 D:/ffmpeg_command_test/pic/001_image-%03d.png
+
+-r 23.866 输出图像序列的帧率为23.866 帧/s  也就是每秒提取月23.866帧作为图像 近似值
+
+-vf ”scale=640*480“ 使用了视频滤镜 通过滤镜的分辨率调整为640*480 确保输出的图像有指定的宽度和高度
+
+-f image2 指定输出格式为图像序列 使用image2 指示 ffmpage 将每个帧保存为单独的图像文件
+
+D:/ffmpeg_command_test/pic/001_image-%03d.png：指定输出图像序列的文件名格式和路径。
+%03d 表示输出文件名中的帧号 其中%3d 表示使用三位数字进行编码 
+
+
+
+图像合成视频
+ffmpeg -i D:/ffmpeg_command_test/pic/001_image-%03d.png -r 23.866 -s 640x480 -c:v libx264 D:/ffmpeg_command_test/001_new.mp4
+
+D:/ffmpeg_command_test/pic/001_image-%03d.png 指定输入图像序列的文件格式 %3d 表示使用三位数字进行编号的图像文件
+-r 23.866 这个参数设置输出视频的帧率为23.866帧/s
+-s 640*480 这个参数设置输出视频的分辨率为640*480
+-c:v libx264 通过指定视频编码器 libx264 将图像序列编码为H.264格式的视频
+
+ffmpeg -i D:/ffmpeg_command_test/pic1/001_image-%03d.png -r 5 001.gif
+
+-i D:/ffmpeg_command_test/pic1/001_image-%03d.png：指定输入的图像文件路径模式。%03d 表示以三位数字序列命名的文件，例如 001_image-001.png，001_image-002.png，依此类推。
+-r 5：设置输出动画的帧率为 5 帧/秒。这个选项告诉FFmpeg在生成GIF动画时使用每秒 5 帧的速度。
+
+pcm：
+PCM是英文Pulse-code modulation的缩写，中文译名是脉冲编码调制。我们知道在现实生活中，人耳听到的声音是模拟信号，PCM就是要把声音从模拟转换成数字信号的一种技术，他的原理简单地说就是利用一个固定的频率对模拟信号进行采样，采样后的信号在波形上看就像一串连续的幅值不一的脉冲，把这些脉冲的幅值按一定的精度进行量化，这些量化后的数值被连续地输出、传输、处理或记录到存储介质中，所有这些组成了数字音频的产生过程。
